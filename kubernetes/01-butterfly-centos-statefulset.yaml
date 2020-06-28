@@ -1,0 +1,27 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: butterfly-centos
+spec:
+  serviceName: butterfly-centos
+  selector:
+    matchLabels:
+      app: butterfly-centos
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: butterfly-centos
+    spec:
+      containers:
+      - name: butterfly-centos
+        image: tmatsuo/butterfly-centos
+        readinessProbe:
+          httpGet:
+            path: /term/
+            port: 80
+        env:
+        - name: PASSWORD
+          value: password
+
