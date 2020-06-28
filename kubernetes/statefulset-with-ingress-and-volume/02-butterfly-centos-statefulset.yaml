@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1 
+kind: StatefulSet
+metadata:
+  name: butterfly-centos
+spec:
+  serviceName: butterfly-centos
+  selector:
+    matchLabels:
+      app: butterfly-centos
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: butterfly-centos
+    spec:
+      initContainers:
+      - name: butterfly-init
+        image: tmatsuo/butterfly-centos
+        volumeMounts:
+        - name: butterfly-centos
+          mountPath: /root-copy
+        command: ["/bin/bash"]
+        args: ["-c", "if [ ! -f /root-copy/.bashrc ]; then cp -a -n /root/. /root-copy/; else echo skip copy root dir; fi"]
+      containers:
+      - name: butterfly-centos
+        image: tmatsuo/butterfly-centos
+        readinessProbe:
+          httpGet:
+            path: /term/
+            port: 80
+        env:
+        - name: PASSWORD
+          value: password
+        volumeMounts:
+        - name: butterfly-centos
+          mountPath: "/root"
+      volumes:
+      - name: butterfly-centos
+        persistentVolumeClaim:
+          claimName: butterfly-centos
+
