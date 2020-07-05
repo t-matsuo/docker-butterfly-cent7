@@ -1,0 +1,114 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: butterfly-centos-full-volume
+spec:
+  serviceName: butterfly-centos-full-volume
+  selector:
+    matchLabels:
+      app: butterfly-centos-full-volume
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: butterfly-centos-full-volume
+    spec:
+      initContainers:
+      - name: butterfly-init
+        image: tmatsuo/butterfly-centos
+        volumeMounts:
+        - name: butterfly-centos-full-volume
+          mountPath: /volume
+        command: ["/bin/bash", "-c"]
+        args:
+        - "
+          if [ ! -d /volume/root ]; then
+              echo copying root dir;
+              cp -a -n /root /volume/;
+          else
+              echo skip copying root dir;
+          fi;
+          if [ ! -d /volume/usr ]; then
+              echo copying usr dir;
+              cp -a -n /usr /volume/;
+          else
+              echo skip copying usr dir; fi;
+          if [ ! -d /volume/etc ]; then
+              echo copying etc dir;
+              cp -a -n /etc /volume/;
+          else
+              echo skip copying etc dir;
+          fi;
+          if [ ! -d /volume/var ]; then
+              echo copying var dir;
+              cp -a -n /var /volume/;
+          else
+              echo skip copying var dir;
+          fi;
+          if [ ! -d /volume/run ]; then
+              echo copying run dir;
+              cp -a -n /run /volume/;
+          else
+              echo skip copying run dir;
+          fi;
+          if [ ! -d /volume/home ]; then
+              echo copying home dir;
+              cp -a -n /home /volume/;
+          else
+              echo skip copying home dir;
+          fi;
+          if [ ! -d /volume/opt ]; then
+              echo copying opt dir;
+              cp -a -n /opt /volume/;
+          else
+              echo skip copying opt dir;
+          fi;
+          if [ ! -d /volume/srv ]; then
+              echo copying srv dir;
+              cp -a -n /srv /volume/;
+          else
+              echo skip copying srv dir;
+          fi;
+          "
+      containers:
+      - name: butterfly-centos-full-volume
+        image: tmatsuo/butterfly-centos
+        readinessProbe:
+          httpGet:
+            path: /term/
+            port: 80
+        env:
+        - name: PASSWORD
+          value: password
+        volumeMounts:
+        - name: butterfly-centos-full-volume
+          mountPath: "/volume"
+        - name: butterfly-centos-full-volume
+          subPath: "root"
+          mountPath: "/root"
+        - name: butterfly-centos-full-volume
+          subPath: "usr"
+          mountPath: "/usr"
+        - name: butterfly-centos-full-volume
+          subPath: "etc"
+          mountPath: "/etc"
+        - name: butterfly-centos-full-volume
+          subPath: "var"
+          mountPath: "/var"
+        - name: butterfly-centos-full-volume
+          subPath: "run"
+          mountPath: "/run"
+        - name: butterfly-centos-full-volume
+          subPath: "home"
+          mountPath: "/home"
+        - name: butterfly-centos-full-volume
+          subPath: "opt"
+          mountPath: "/opt"
+        - name: butterfly-centos-full-volume
+          subPath: "srv"
+          mountPath: "/srv"
+      volumes:
+      - name: butterfly-centos-full-volume
+        persistentVolumeClaim:
+          claimName: butterfly-centos-full-volume
