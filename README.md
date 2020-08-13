@@ -14,6 +14,7 @@ Example:
 * Default port is 80. You can change it using PORT env.
 * Default path is /term/. Please access http://xx.xx.xx.xx/term/
 * You can add OPTS env. Default is '--keepalive_interval=10 --force_unicode_width=True --uri_root_path=/term/'
+* Default language is Japanese.
 
 ## Sample manifest for Kubernetes
 
